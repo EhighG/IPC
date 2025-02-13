@@ -1,4 +1,4 @@
-#include <signal.h>
+ï»¿#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,26 +11,26 @@
 #define READY 1
 #define NOT_READY -1
 
-// ¸Ş¸ğ¸® ±¸Á¶Ã¼
+// ë©”ëª¨ë¦¬ êµ¬ì¡°ì²´
 struct memory {
 	char buff[100];
 	int status, pid1, pid2;
 };
 
-// °øÀ¯ ¸Ş¸ğ¸®¸¦ ÀúÀåÇÒ memory ±¸Á¶Ã¼ÀÇ Àü¿ªº¯¼ö »ı¼º
+// ê³µìœ  ë©”ëª¨ë¦¬ë¥¼ ì €ì¥í•  memory êµ¬ì¡°ì²´ì˜ ì „ì—­ë³€ìˆ˜ ìƒì„±
 struct memory* shmptr;
 
 void handler(int signum)
 {
-	// clientA·ÎºÎÅÍ ¸Ş½ÃÁö ¼ö½Å
+	// clientAë¡œë¶€í„° ë©”ì‹œì§€ ìˆ˜ì‹ 
 	if (signum == SIGUSR2) {
-		printf("\n¼ö½Å ´ë±â... \n");
+		printf("\nìˆ˜ì‹  ëŒ€ê¸°... \n");
 		printf("A) ");
 		puts(shmptr->buff);
 
-		// ¼ö½Å¹ŞÀº ¸Ş½ÃÁö°¡ exitÀÏ °æ¿ì
+		// ìˆ˜ì‹ ë°›ì€ ë©”ì‹œì§€ê°€ exitì¼ ê²½ìš°
 		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù. ====\n");
+			printf("==== í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤. ====\n");
 			exit(0);
 		}
 	}
@@ -43,13 +43,13 @@ int main()
 
 	int key = 12345;
 
-	// °øÀ¯ ¸Ş¸ğ¸® »ı¼º
+	// ê³µìœ  ë©”ëª¨ë¦¬ ìƒì„±
 	shmid = shmget(key, sizeof(struct memory), IPC_CREAT | 0666);
 
-	// °øÀ¯ ¸Ş¸ğ¸®¸¦ ÇÁ·Î¼¼½ºÀÇ °¡»ó ÁÖ¼Ò °ø°£°ú ¿¬°á
+	// ê³µìœ  ë©”ëª¨ë¦¬ë¥¼ í”„ë¡œì„¸ìŠ¤ì˜ ê°€ìƒ ì£¼ì†Œ ê³µê°„ê³¼ ì—°ê²°
 	shmptr = (struct memory*)shmat(shmid, NULL, 0);
 
-	// °øÀ¯ ¸Ş¸ğ¸®¿¡ Çö ÇÁ·Î¼¼½º(clientB)ÀÇ pid ÀúÀå, ÁØºñµÇÁö ¾ÊÀº »óÅÂ(NOT_READY) ÀúÀå
+	// ê³µìœ  ë©”ëª¨ë¦¬ì— í˜„ í”„ë¡œì„¸ìŠ¤(clientB)ì˜ pid ì €ì¥, ì¤€ë¹„ë˜ì§€ ì•Šì€ ìƒíƒœ(NOT_READY) ì €ì¥
 	shmptr->pid2 = pid;
 	shmptr->status = NOT_READY;
 
@@ -58,16 +58,16 @@ int main()
 	while (1) {
 		sleep(1);
 
-		// ¸Ş½ÃÁö ÀÔ·Â¹Ş±â
-		printf("ÀÔ·Â ´ë±â: \n");
+		// ë©”ì‹œì§€ ì…ë ¥ë°›ê¸°
+		printf("ì…ë ¥ ëŒ€ê¸°: \n");
 		fgets(shmptr->buff, 100, stdin);
 
 		shmptr->status = READY;
 		kill(shmptr->pid1, SIGUSR1);
 
-		// ÀÔ·Â¹ŞÀº ¸Ş½ÃÁö°¡ exitÀÏ ¶§
+		// ì…ë ¥ë°›ì€ ë©”ì‹œì§€ê°€ exitì¼ ë•Œ
 		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù. ====\n");
+			printf("==== í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤. ====\n");
 			exit(0);
 			break;
 		}
@@ -75,7 +75,7 @@ int main()
 			continue;
 	}
 
-	// »ç¿ë Á¾·á: °øÀ¯ ¸Ş¸ğ¸®¿Í ¿¬°á ÇØÁ¦
+	// ì‚¬ìš© ì¢…ë£Œ: ê³µìœ  ë©”ëª¨ë¦¬ì™€ ì—°ê²° í•´ì œ
 	shmdt((void*)shmptr);
 	return 0;
 }

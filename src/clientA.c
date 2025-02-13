@@ -1,4 +1,4 @@
-#include <signal.h>
+ï»¿#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,17 +18,17 @@ struct memory {
 
 struct memory* shmptr;
 
-// clientB·ÎºÎÅÍ ¹ŞÀº ¸Ş½ÃÁö¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö
+// clientBë¡œë¶€í„° ë°›ì€ ë©”ì‹œì§€ë¥¼ ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
 void handler(int signum)
 {
-	// user1ÀÌ clientB·ÎºÎÅÍ ¸Ş½ÃÁö¸¦ ¹ŞÀº °æ¿ì
+	// user1ì´ clientBë¡œë¶€í„° ë©”ì‹œì§€ë¥¼ ë°›ì€ ê²½ìš°
 	if (signum == SIGUSR1) {
-		// shmptr Æ÷ÀÎÅÍ°¡ °¡¸®Å°´Â ±¸Á¶Ã¼ÀÇ ¸â¹öº¯¼ö buff¿¡ ÀúÀåµÈ ¸Ş½ÃÁö¸¦ Ãâ·Â
-		printf("\nclientB·ÎºÎÅÍÀÇ ¸Ş½ÃÁö: %s\n", shmptr->buff);
+		// shmptr í¬ì¸í„°ê°€ ê°€ë¦¬í‚¤ëŠ” êµ¬ì¡°ì²´ì˜ ë©¤ë²„ë³€ìˆ˜ buffì— ì €ì¥ëœ ë©”ì‹œì§€ë¥¼ ì¶œë ¥
+		printf("\nclientBë¡œë¶€í„°ì˜ ë©”ì‹œì§€: %s\n", shmptr->buff);
 
-		// ¼ö½ÅÇÑ ¹®ÀÚ¿­ÀÌ exitÀÏ ¶§
+		// ìˆ˜ì‹ í•œ ë¬¸ìì—´ì´ exitì¼ ë•Œ
 		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù. ====\n");
+			printf("==== í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤. ====\n");
 			exit(0);
 		}
 	}
@@ -36,49 +36,49 @@ void handler(int signum)
 
 int main()
 {
-	int pid = getpid(); // ÇöÀç ÇÁ·Î¼¼½º(user1)ÀÇ pid
+	int pid = getpid(); // í˜„ì¬ í”„ë¡œì„¸ìŠ¤(user1)ì˜ pid
 	int shmid;
-	int key = 12345; // °øÀ¯ ¸Ş¸ğ¸®ÀÇ Å° °ª
+	int key = 12345; // ê³µìœ  ë©”ëª¨ë¦¬ì˜ í‚¤ ê°’
 
-	// °øÀ¯ ¸Ş¸ğ¸® »ı¼º
+	// ê³µìœ  ë©”ëª¨ë¦¬ ìƒì„±
 	shmid = shmget(key, sizeof(struct memory), IPC_CREAT | 0666);
 
-	// °øÀ¯ ¸Ş¸ğ¸®¸¦ ÇöÀç ÇÁ·Î¼¼½ºÀÇ °¡»ó ÁÖ¼Ò °ø°£°ú ¿¬°á
-	// ¸¶Áö¸· ÀÎÀÚ 0ÀÇ ÀÇ¹Ì : ÇÃ·¡±×¸¦ »ç¿ëÇÏÁö ¾ÊÀ½
+	// ê³µìœ  ë©”ëª¨ë¦¬ë¥¼ í˜„ì¬ í”„ë¡œì„¸ìŠ¤ì˜ ê°€ìƒ ì£¼ì†Œ ê³µê°„ê³¼ ì—°ê²°
+	// ë§ˆì§€ë§‰ ì¸ì 0ì˜ ì˜ë¯¸ : í”Œë˜ê·¸ë¥¼ ì‚¬ìš©í•˜ì§€ ì•ŠìŒ
 	shmptr = (struct memory*)shmat(shmid, NULL, 0);
 
-	// °øÀ¯ ¸Ş¸ğ¸®¿¡ ÇÁ·Î¼¼½º id ÀúÀå, ÁØºñµÇÁö ¾ÊÀº »óÅÂ(NOT_READY) ÀúÀå
+	// ê³µìœ  ë©”ëª¨ë¦¬ì— í”„ë¡œì„¸ìŠ¤ id ì €ì¥, ì¤€ë¹„ë˜ì§€ ì•Šì€ ìƒíƒœ(NOT_READY) ì €ì¥
 	shmptr->pid1 = pid;
 	shmptr->status = NOT_READY;
 
-	// handler ÀÌ¿ëÇÑ ½Ã±×³Î Ã³¸®
+	// handler ì´ìš©í•œ ì‹œê·¸ë„ ì²˜ë¦¬
 	signal(SIGUSR1, handler);
 
 	while (1) {
 		while (shmptr->status != READY)
 			continue;
 		sleep(1);
-		// ¸Ş½ÃÁö ÀÔ·Â¹Ş±â
-		printf("ÀÔ·Â ´ë±â: \n");
-		// ¹öÆÛ¿¡ ¸Ş½ÃÁö ÀúÀå, ÃÖ´ë±æÀÌ, ¹®ÀÚ¿­ ÀĞ¾îµéÀÏ ÆÄÀÏ Æ÷ÀÎÅÍ
+		// ë©”ì‹œì§€ ì…ë ¥ë°›ê¸°
+		printf("ì…ë ¥ ëŒ€ê¸°: \n");
+		// ë²„í¼ì— ë©”ì‹œì§€ ì €ì¥, ìµœëŒ€ê¸¸ì´, ë¬¸ìì—´ ì½ì–´ë“¤ì¼ íŒŒì¼ í¬ì¸í„°
 		fgets(shmptr->buff, 100, stdin);
 
 		shmptr->status = FILLED;
 
-		// killÇÔ¼ö·Î clientB¿¡°Ô ¸Ş½ÃÁö Àü¼Û
+		// killí•¨ìˆ˜ë¡œ clientBì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
 		kill(shmptr->pid2, SIGUSR2);
 
 		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù. ====\n");
+			printf("==== í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤. ====\n");
 			exit(0);
 			break;
 		}
 	}
 
-	// »ç¿ë Á¾·á: °øÀ¯ ¸Ş¸ğ¸®¿Í ¿¬°á ÇØÁ¦
+	// ì‚¬ìš© ì¢…ë£Œ: ê³µìœ  ë©”ëª¨ë¦¬ì™€ ì—°ê²° í•´ì œ
 	shmdt((void*)shmptr);
 
-	// °øÀ¯ ¸Ş¸ğ¸® ¼¼±×¸ÕÆ® Á¦°Å
+	// ê³µìœ  ë©”ëª¨ë¦¬ ì„¸ê·¸ë¨¼íŠ¸ ì œê±°
 	shmctl(shmid, IPC_RMID, NULL);
 	return 0;
 }
