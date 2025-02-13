@@ -21,16 +21,14 @@ struct memory* shmptr;
 // clientB로부터 받은 메시지를 출력하는 함수
 void handler(int signum)
 {
-	// user1이 clientB로부터 메시지를 받은 경우
-	if (signum == SIGUSR1) {
-		// shmptr 포인터가 가리키는 구조체의 멤버변수 buff에 저장된 메시지를 출력
-		printf("\nclientB로부터의 메시지: %s\n", shmptr->buff);
+	// shmptr 포인터가 가리키는 구조체의 멤버변수 buff에 저장된 메시지를 출력
+	printf("\nB) ");
+	puts(shmptr->buff);
 
-		// 수신한 문자열이 exit일 때
-		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== 프로그램을 종료합니다. ====\n");
-			exit(0);
-		}
+	// 수신한 문자열이 exit일 때
+	if (strcmp(shmptr->buff, "exit\n") == 0) {
+		printf("==== 프로그램을 종료합니다. ====\n");
+		exit(0);
 	}
 }
 
@@ -54,6 +52,8 @@ int main()
 	// handler 이용한 시그널 처리
 	signal(SIGUSR1, handler);
 
+	printf("채팅을 시작합니다.\n");
+
 	while (1) {
 		while (shmptr->status != READY)
 			continue;
@@ -69,7 +69,7 @@ int main()
 		kill(shmptr->pid2, SIGUSR2);
 
 		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== 프로그램을 종료합니다. ====\n");
+			printf("\n==== 프로그램을 종료합니다. ====\n");
 			exit(0);
 			break;
 		}

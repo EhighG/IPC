@@ -22,17 +22,13 @@ struct memory* shmptr;
 
 void handler(int signum)
 {
-	// clientA로부터 메시지 수신
-	if (signum == SIGUSR2) {
-		printf("\n수신 대기... \n");
-		printf("A) ");
-		puts(shmptr->buff);
+	printf("\nA) ");
+	puts(shmptr->buff);
 
-		// 수신받은 메시지가 exit일 경우
-		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== 프로그램을 종료합니다. ====\n");
-			exit(0);
-		}
+	// 수신한 메시지가 exit일 경우
+	if (strcmp(shmptr->buff, "exit\n") == 0) {
+		printf("==== 프로그램을 종료합니다. ====\n");
+		exit(0);
 	}
 }
 
@@ -55,6 +51,8 @@ int main()
 
 	signal(SIGUSR2, handler);
 
+	printf("채팅을 시작합니다.\n");
+
 	while (1) {
 		sleep(1);
 
@@ -67,7 +65,7 @@ int main()
 
 		// 입력받은 메시지가 exit일 때
 		if (strcmp(shmptr->buff, "exit\n") == 0) {
-			printf("==== 프로그램을 종료합니다. ====\n");
+			printf("\n==== 프로그램을 종료합니다. ====\n");
 			exit(0);
 			break;
 		}
