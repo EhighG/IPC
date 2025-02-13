@@ -45,7 +45,7 @@ int main()
 
 	// 공유 메모리를 현재 프로세스의 가상 주소 공간과 연결
 	// 마지막 인자 0의 의미 : 플래그를 사용하지 않음
-	shmptr - (struct memory*)shmat(shmid, NULL, 0);
+	shmptr = (struct memory*)shmat(shmid, NULL, 0);
 
 	// 공유 메모리에 프로세스 id 저장, 준비되지 않은 상태(NOT_READY) 저장
 	shmptr->pid1 = pid;
